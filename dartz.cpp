@@ -1,36 +1,78 @@
 #include <fstream>
+#define PMAX 350
 using namespace std;
-bool esteProdusDeTreiNumereConsecutive(int p, int & x);
+int S, np, min1, min2;
+int xmin[PMAX], p[PMAX];
+void citire();
+void generareProduse();
+void afisare();
+bool cautareBinara(
+    int x,
+    int v[],
+    int st,
+    int dr,
+    int & poz);
 int main()
 {
-    ifstream f("dartz.in");
-    ofstream g("dartz.out");
-    int S;
-    f >> S;
-    f.close();
-    int p1, p2;
-    for (p1 = 0, p2 = S/2; p1 <= p2; p1 += 2, p2 -= 2)
+    citire();
+    generareProduse();
+    for (int i = 0; i < np; i++)
     {
-        int x, y;
-        if (esteProdusDeTreiNumereConsecutive(p1, x)
-            && esteProdusDeTreiNumereConsecutive(p2, y))
+        int produs = S/2 - p[i];
+        int poz;
+        if (cautareBinara(produs, p, i+1, np-1, poz))
         {
-            g << x << ' ' << y << ' ';
-            g << x << ' ' << y;
+            min1 = xmin[i];
+            min2 = xmin[poz];
             break;
         }
     }
-    g.close();
+    afisare();
     return 0;
 }
-bool esteProdusDeTreiNumereConsecutive(int p, int & x)
+bool cautareBinara(
+    int x,
+    int v[],
+    int st,
+    int dr,
+    int & poz)
 {
-    x = 0;
-    int pp = 0;
-    while (pp < p)
+    poz = -1;
+    st--, dr++;
+    while (dr-st > 1)
     {
-        x++;
-        pp = x * (x+1) * (x+2);
+        int mij = st + (dr-st)/2;
+        if (v[mij] == x)
+        {
+            poz = mij;
+            return 1;
+        }
+        if (v[mij] < x) st = mij;
+        else dr = mij;
     }
-    return pp == p;
+    return 0;
+}
+void afisare()
+{
+    ofstream g("dartz.out");
+    g << min1 << ' ' << min2 << ' ';
+    g << min1 << ' ' << min2;
+    g.close();
+}
+void generareProduse()
+{
+    int x = 0, produs = 0;
+    while (produs < S/2)
+    {
+        xmin[np] = x;
+        p[np++] = produs;
+        x++;
+        produs = x * (x+1) * (x+2);
+    }
+}
+void citire()
+{
+    ifstream f("dartz.in");
+    f >> S;
+    f.close();
 }
